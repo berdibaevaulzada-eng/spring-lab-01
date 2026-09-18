@@ -16,11 +16,15 @@ public class NotificationController {
 
         if (type.equalsIgnoreCase("sms")) {
             notifier = new SmsNotifier();
-        } else {
+        } else if (type.equalsIgnoreCase("email")) {
             notifier = new EmailNotifier();
+        } else if (type.equalsIgnoreCase("console")) {
+            notifier = new ConsoleNotifier();
+        } else {
+            notifier = new NoopNotifier();
         }
 
-        NotificationService service = new NotificationService(notifier);
-        return service.notify(message);
-    }
+    NotificationService service = new NotificationService(notifier);
+return service.notify(message);
+}
 }
