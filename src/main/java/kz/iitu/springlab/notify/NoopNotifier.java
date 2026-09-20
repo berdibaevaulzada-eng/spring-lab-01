@@ -1,5 +1,10 @@
 package kz.iitu.springlab.notify;
 
+import org.springframework.context.annotation.Fallback;
+import org.springframework.stereotype.Component;
+
+@Component
+@Fallback
 public class NoopNotifier implements Notifier {
 
     @Override
