@@ -1,0 +1,18 @@
+server:
+  port: 8080
+
+app:
+  locale:
+    default-locale: ru
+    supported:
+      - ru
+      - kk
+      - en
+
+  mail:
+    enabled: true
+    retry-count: 5
+
+logging:
+  level:
+    kz.iitu: WARN
