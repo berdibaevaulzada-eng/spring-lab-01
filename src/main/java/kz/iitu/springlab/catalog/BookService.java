@@ -34,7 +34,32 @@ public class BookService {
     }
 
     public Book create(Book book) {
+        boolean exists = repository.findAll().stream()
+                .anyMatch(existing ->
+                        existing.title().equalsIgnoreCase(book.title())
+                                && existing.author().equalsIgnoreCase(book.author())
+                );
+
+        if (exists) {
+            throw new DuplicateTitleException(book.title());
+        }
+
         return repository.save(book);
+    }
+    public Book update(long id, Book book) {
+        Book existing = repository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+
+        Book updated = new Book(
+                existing.id(),
+                book.title(),
+                book.author(),
+                book.year(),
+                book.genre(),
+                existing.createdAt()
+        );
+
+        return repository.save(updated);
     }
 
     public boolean delete(long id) {
