@@ -1,6 +1,8 @@
 
 package kz.iitu.springlab.catalog;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,20 +18,31 @@ public class BookService {
     }
 
     public List<Book> findAll(String author) {
-        if (author == null) {
+        if (author == null || author.isBlank()) {
             return repository.findAll();
         }
 
         return repository.findAll().stream()
-                .filter(book -> book.author().toLowerCase()
-                        .contains(author.toLowerCase()))
+                .filter(book ->
+                        book.author() != null &&
+                                book.author().toLowerCase()
+                                        .contains(author.toLowerCase()))
                 .toList();
+    }
+
+    public Page<Book> find(Genre genre, Pageable pageable) {
+        if (genre == null) {
+            return repository.findAll(pageable);
+        }
+
+        return repository.findByGenre(genre, pageable);
     }
 
     public Optional<Book> findById(long id) {
         return Optional.of(
                 repository.findById(id)
-                        .orElseThrow(() -> new BookNotFoundException(id))
+                        .orElseThrow(() ->
+                                new BookNotFoundException(id))
         );
     }
 
@@ -37,7 +50,10 @@ public class BookService {
         boolean exists = repository.findAll().stream()
                 .anyMatch(existing ->
                         existing.title().equalsIgnoreCase(book.title())
-                                && existing.author().equalsIgnoreCase(book.author())
+                                && existing.author() != null
+                                && book.author() != null
+                                && existing.author()
+                                .equalsIgnoreCase(book.author())
                 );
 
         if (exists) {
@@ -46,23 +62,26 @@ public class BookService {
 
         return repository.save(book);
     }
+
     public Book update(long id, Book book) {
         Book existing = repository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException(id));
+                .orElseThrow(() ->
+                        new BookNotFoundException(id));
 
-        Book updated = new Book(
-                existing.id(),
-                book.title(),
-                book.author(),
-                book.year(),
-                book.genre(),
-                existing.createdAt()
-        );
+        existing.setTitle(book.title());
+        existing.setAuthor(book.author());
+        existing.setYear(book.year());
+        existing.setGenre(book.genre());
 
-        return repository.save(updated);
+        return repository.save(existing);
     }
 
     public boolean delete(long id) {
-        return repository.deleteById(id);
+        if (!repository.existsById(id)) {
+            return false;
+        }
+
+        repository.deleteById(id);
+        return true;
     }
 }

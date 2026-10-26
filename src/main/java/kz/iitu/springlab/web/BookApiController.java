@@ -1,17 +1,21 @@
-
 package kz.iitu.springlab.web;
 
 import kz.iitu.springlab.catalog.Book;
 import kz.iitu.springlab.catalog.BookService;
+import kz.iitu.springlab.catalog.Genre;
+
 import kz.iitu.springlab.web.dto.BookMapper;
 import kz.iitu.springlab.web.dto.BookRequest;
 import kz.iitu.springlab.web.dto.BookResponse;
 
 import jakarta.validation.Valid;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +27,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.net.URI;
-import java.util.List;
 
 @Tag(name = "Books", description = "The catalogue of books")
 @RestController
@@ -38,11 +41,14 @@ public class BookApiController {
         this.mapper = mapper;
     }
 
+    // Task 4: Pagination and sorting
     @GetMapping
-    public List<BookResponse> list(
-            @RequestParam(required = false) String author) {
+    public Page<BookResponse> list(
+            @RequestParam(required = false) Genre genre,
+            @PageableDefault(size = 5, sort = "title") Pageable pageable) {
 
-        return mapper.toResponseList(service.findAll(author));
+        return service.find(genre, pageable)
+                .map(mapper::toResponse);
     }
 
     @Operation(summary = "Find a book by its identifier")
