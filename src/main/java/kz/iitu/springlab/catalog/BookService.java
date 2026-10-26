@@ -4,6 +4,7 @@ package kz.iitu.springlab.catalog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,5 +84,26 @@ public class BookService {
 
         repository.deleteById(id);
         return true;
+    }
+    public String testOptimisticLocking(long id) {
+        Book first = repository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+
+        Book second = repository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+
+        // Simulate the first update
+        first.setYear(first.year() + 1);
+        repository.saveAndFlush(first);
+
+        // Simulate the second update with an old version
+        second.setYear(second.year() + 2);
+
+        try {
+            repository.saveAndFlush(second);
+            return "Both updates succeeded";
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return "409 Conflict: Optimistic locking failed";
+        }
     }
 }
