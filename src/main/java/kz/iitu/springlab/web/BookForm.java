@@ -1,7 +1,9 @@
+
 package kz.iitu.springlab.web;
 
 import jakarta.validation.constraints.*;
 import kz.iitu.springlab.catalog.Genre;
+import kz.iitu.springlab.validation.NoDigits;
 
 public class BookForm {
 
@@ -10,6 +12,7 @@ public class BookForm {
     private String title;
 
     @NotBlank(message = "{book.author.required}")
+    @NoDigits
     private String author;
 
     @Min(value = 1450, message = "{book.year.range}")

@@ -1,13 +1,15 @@
+
 package kz.iitu.springlab.web;
 
+import kz.iitu.springlab.catalog.Book;
 import kz.iitu.springlab.catalog.BookService;
+import kz.iitu.springlab.catalog.Genre;
+
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import kz.iitu.springlab.catalog.Book;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -21,8 +23,9 @@ public class BookPageController {
     }
 
     @GetMapping
-    public String list(@RequestParam(required = false) String author,
-                       Model model) {
+    public String list(
+            @RequestParam(required = false) String author,
+            Model model) {
 
         model.addAttribute("books", service.findAll(author));
         model.addAttribute("author", author);
@@ -30,13 +33,49 @@ public class BookPageController {
 
         return "books/list";
     }
-    @PostMapping
-    public String create(@RequestParam String title,
-                         @RequestParam String author,
-                         @RequestParam int year,
-                         RedirectAttributes redirect) {
 
-        Book saved = service.create(new Book(null, title, author, year));
+    @GetMapping("/new")
+    public String newForm(Model model) {
+        model.addAttribute("form", new BookForm());
+        model.addAttribute("genres", Genre.values());
+
+        return "books/form";
+    }
+
+    @GetMapping("/{id}")
+    public String findById(
+            @PathVariable long id,
+            Model model) {
+
+        Book book = service.findById(id).orElseThrow();
+
+        model.addAttribute("book", book);
+        model.addAttribute("books", java.util.List.of(book));
+        model.addAttribute("title", "Book details");
+
+        return "books/list";
+    }
+
+    @PostMapping
+    public String create(
+            @Valid @ModelAttribute("form") BookForm form,
+            BindingResult binding,
+            Model model,
+            RedirectAttributes redirect) {
+
+        if (binding.hasErrors()) {
+            model.addAttribute("genres", Genre.values());
+            return "books/form";
+        }
+
+        Book saved = service.create(
+                new Book(
+                        null,
+                        form.getTitle(),
+                        form.getAuthor(),
+                        form.getYear()
+                )
+        );
 
         redirect.addFlashAttribute(
                 "message",

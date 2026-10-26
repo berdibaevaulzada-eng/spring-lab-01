@@ -1,3 +1,4 @@
+
 package kz.iitu.springlab.catalog;
 
 import org.springframework.stereotype.Service;
@@ -20,12 +21,16 @@ public class BookService {
         }
 
         return repository.findAll().stream()
-                .filter(book -> book.author().toLowerCase().contains(author.toLowerCase()))
+                .filter(book -> book.author().toLowerCase()
+                        .contains(author.toLowerCase()))
                 .toList();
     }
 
     public Optional<Book> findById(long id) {
-        return repository.findById(id);
+        return Optional.of(
+                repository.findById(id)
+                        .orElseThrow(() -> new BookNotFoundException(id))
+        );
     }
 
     public Book create(Book book) {
