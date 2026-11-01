@@ -1,10 +1,9 @@
-
 spring:
   application:
     name: spring-lab
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/springlab
+    url: jdbc:postgresql://localhost:5432/lab09
     username: springlab
     password: springlab
 
@@ -16,6 +15,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+    locations: classpath:db/migration
 
 server:
   port: 8080
