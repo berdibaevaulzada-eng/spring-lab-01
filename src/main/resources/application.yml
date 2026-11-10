@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: spring-lab
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lab09
+    username: springlab
+    password: springlab
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+    locations: classpath:db/migration
+
+server:
+  port: 8080
+
+app:
+  owner: Berdibaeva Ulzada
+  group: IS-2406
+
+  locale:
+    default-locale: en
+    supported:
+      - en
+      - ru
+      - kk
+
+  mail:
+    from: no-reply@iitu.kz
+    retry-count: 3
+    timeout: 5s
+    enabled: true
+
+logging:
+  level:
+    kz.iitu: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,env,configprops,conditions
