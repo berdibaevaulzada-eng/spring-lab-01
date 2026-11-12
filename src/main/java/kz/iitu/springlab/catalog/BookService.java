@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Optional;
@@ -77,6 +78,7 @@ public class BookService {
         return repository.save(existing);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean delete(long id) {
         if (!repository.existsById(id)) {
             return false;
@@ -85,6 +87,7 @@ public class BookService {
         repository.deleteById(id);
         return true;
     }
+
     public String testOptimisticLocking(long id) {
         Book first = repository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));

@@ -1,5 +1,8 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <title th:text="${title}">Catalogue</title>
@@ -10,8 +13,39 @@
 
 <h1 th:text="${title}">Catalogue</h1>
 
-<p th:if="${message}" class="flash" th:text="${message}"></p>
+<!-- Current user and role -->
+<div>
+    <p>
+        <strong>Logged in as:</strong>
+        <span sec:authentication="name">anonymous</span>
+    </p>
 
+    <p>
+        <strong>Role:</strong>
+        <span sec:authentication="principal.authorities">
+            ROLE_USER
+        </span>
+    </p>
+</div>
+
+<!-- Only ADMIN can see this link -->
+<div sec:authorize="hasRole('ADMIN')">
+    <a th:href="@{/admin}">Administration</a>
+</div>
+
+<!-- Logout button -->
+<form th:action="@{/logout}" method="post">
+    <button type="submit">Log out</button>
+</form>
+
+<hr>
+
+<p th:if="${message}"
+   class="flash"
+   th:text="${message}">
+</p>
+
+<!-- Books table -->
 <table>
     <tr>
         <th>#</th>
